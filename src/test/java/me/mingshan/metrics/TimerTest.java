@@ -1,6 +1,7 @@
 package me.mingshan.metrics;
 
 import io.micrometer.core.instrument.FunctionTimer;
+import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -56,6 +57,22 @@ public class TimerTest {
     totalCount.incrementAndGet();
 
     System.out.println(functionTimer.measure());
+  }
+
+  @Test
+  public void test3() {
+    Metrics.addRegistry(new SimpleMeterRegistry());
+    LongTaskTimer longTaskTimer = Metrics.globalRegistry.more().longTaskTimer("longTaskTimer");
+    longTaskTimer.record(() -> {
+      //这里编写Task的逻辑
+      try {
+        Thread.sleep(2000L);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    });
+
+    System.out.println(longTaskTimer.measure());
   }
 
   private void createOrder(Order order1) {
